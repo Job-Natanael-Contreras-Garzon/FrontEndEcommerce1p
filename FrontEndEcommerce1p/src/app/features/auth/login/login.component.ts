@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService }       from '../../../core/services/auth.service';
+import { AuthService }      from '../../../core/services/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
-
 
 @Component({
   selector: 'app-login',
@@ -28,11 +27,13 @@ export class LoginComponent implements OnInit {
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
-    this.auth.logout();  // aseguramos estado limpio
+    this.auth.logout();
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
-  get f() { return this.loginForm.controls; }
+  get f(): any {
+    return this.loginForm.controls;
+  }
 
   onSubmit(): void {
     this.submitted = true;
