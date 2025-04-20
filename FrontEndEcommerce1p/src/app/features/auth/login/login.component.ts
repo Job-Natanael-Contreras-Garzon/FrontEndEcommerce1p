@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService }      from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -14,6 +14,7 @@ export class LoginComponent implements OnInit {
   submitted = false;
   returnUrl = '/';
   error = '';
+  hidePassword = true;
 
   constructor(
     private fb: FormBuilder,
@@ -24,26 +25,54 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
-      username: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
-    this.auth.logout();
+    
+    // Get return url from route parameters or default to '/'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    
+    // Redirect if already logged in
+    if (this.auth.isLoggedIn()) {
+      this.router.navigate([this.returnUrl]);
+    }
   }
 
-  get f(): any {
+  get f() {
     return this.loginForm.controls;
+  }
+
+  togglePasswordVisibility(event: MouseEvent): void {
+    event.preventDefault();
+    this.hidePassword = !this.hidePassword;
   }
 
   onSubmit(): void {
     this.submitted = true;
     this.error = '';
-    if (this.loginForm.invalid) return;
+    
+    if (this.loginForm.invalid) {
+      return;
+    }
+
     this.loading = true;
-    this.auth.login(this.loginForm.value).subscribe({
-      next: () => this.router.navigateByUrl(this.returnUrl),
-      error: err => {
-        this.error = err.error?.message || 'Login failed';
+
+    const loginData = {
+      email: this.loginForm.value.email,
+      password: this.loginForm.value.password
+    };
+
+    this.auth.login(loginData).subscribe({
+      next: (response) => {
+        if (response.status === 'success') {
+          this.router.navigateByUrl(this.returnUrl);
+        } else {
+          this.error = response.message || 'Login failed';
+          this.loading = false;
+        }
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'Credenciales incorrectas';
         this.loading = false;
       }
     });

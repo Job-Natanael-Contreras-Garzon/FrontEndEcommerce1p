@@ -1,49 +1,65 @@
-import { Injectable }      from '@angular/core';
-import { Router }          from '@angular/router';
+// src/app/core/services/auth.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap }             from 'rxjs/operators';
-import { ApiService }      from './api.service';
-import { User }            from '../models/user.model';
+import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+interface LoginResponse {
+  status: string;
+  message: string;
+  token: string;
+  user_id: number;
+}
+
+interface RegisterResponse {
+  status: string;
+  message: string;
+  user_id: number;
+}
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private tokenKey = 'access_token';
-  private userSub = new BehaviorSubject<User|null>(null);
-  public user$ = this.userSub.asObservable();
+  private base = environment.apiUrl;
+  private userIdSub = new BehaviorSubject<number | null>(null);
+  public userId$ = this.userIdSub.asObservable();
 
-  constructor(
-    private api: ApiService,
-    private router: Router
-  ) {
-    const token = this.getToken();
-    if (token) this.loadUser();
+  constructor(private http: HttpClient) {
+    const id = this.getUserId();
+    if (id) this.userIdSub.next(id);
   }
 
-  login(credentials: {username: string, password: string}): Observable<any> {
-    return this.api.post<{token: string, user: User}>('/auth/login/', credentials)
-      .pipe(tap(res => {
-        localStorage.setItem(this.tokenKey, res.token);
-        this.userSub.next(res.user);
-      }));
+  login(data: { email: string; password: string }): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.base}/api/login`, data)
+      .pipe(
+        tap(res => {
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('user_id', String(res.user_id));
+          this.userIdSub.next(res.user_id);
+        })
+      );
+  }
+
+  register(data: { name: string; email: string; password: string }): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.base}/api/register`, data);
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
-    this.userSub.next(null);
-    this.router.navigate(['/auth/login']);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user_id');
+    this.userIdSub.next(null);
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return localStorage.getItem('token');
+  }
+
+  getUserId(): number | null {
+    const id = localStorage.getItem('user_id');
+    return id ? +id : null;
   }
 
   isLoggedIn(): boolean {
     return !!this.getToken();
-  }
-
-  private loadUser() {
-    this.api.get<User>('/auth/me/').subscribe(u => this.userSub.next(u));
   }
 }

@@ -1,0 +1,17 @@
+@mixin responsive($breakpoint) {
+    @if $breakpoint == phone {
+      @media (max-width: 480px) { @content; }
+    }
+    @if $breakpoint == tablet {
+      @media (max-width: 768px) { @content; }
+    }
+    @if $breakpoint == laptop {
+      @media (max-width: 1024px) { @content; }
+    }
+  }
+  
+  @mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
