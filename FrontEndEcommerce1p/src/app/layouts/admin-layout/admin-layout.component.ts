@@ -1,10 +1,14 @@
-import { Component } from '@angular/core';
+// admin-layout.module.ts
+import { SharedModule } from '../shared/shared.module';
 
-@Component({
-  selector: 'app-admin-layout',
-  templateUrl: './admin-layout.component.html',
-  styleUrls: ['./admin-layout.component.scss']
+@NgModule({
+  declarations: [
+    AdminLayoutComponent
+  ],
+  imports: [
+    CommonModule,
+    SharedModule,  // Agrega este import
+    // otros imports...
+  ]
 })
-export class AdminLayoutComponent {
-
-}
+export class AdminLayoutModule { 
