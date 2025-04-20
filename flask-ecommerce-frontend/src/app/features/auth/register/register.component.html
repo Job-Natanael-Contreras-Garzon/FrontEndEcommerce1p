@@ -1,1 +1,99 @@
-<p>register works!</p>
+<div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2>Crear cuenta</h2>
+        <p>Completa el formulario para registrarte</p>
+      </div>
+  
+      <app-alert></app-alert>
+  
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="name">Nombre completo</label>
+          <input
+            type="text"
+            formControlName="name"
+            class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && f['name'].errors }"
+            placeholder="Tu nombre completo"
+          />
+          <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">
+            <div *ngIf="f['name'].errors['required']">El nombre es obligatorio</div>
+            <div *ngIf="f['name'].errors['minlength']">El nombre debe tener al menos 3 caracteres</div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="email">Correo electrónico</label>
+          <input
+            type="email"
+            formControlName="email"
+            class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && f['email'].errors }"
+            placeholder="nombre@ejemplo.com"
+          />
+          <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+            <div *ngIf="f['email'].errors['required']">El correo electrónico es obligatorio</div>
+            <div *ngIf="f['email'].errors['email']">Ingresa un correo electrónico válido</div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <div class="password-input-container">
+            <input
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f['password'].errors }"
+              placeholder="Crea una contraseña segura"
+            />
+            <button 
+              type="button" 
+              class="password-toggle"
+              (click)="togglePasswordVisibility('password')"
+            >
+              <i class="bi" [ngClass]="hidePassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+          <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+            <div *ngIf="f['password'].errors['required']">La contraseña es obligatoria</div>
+            <div *ngIf="f['password'].errors['minlength']">La contraseña debe tener al menos 6 caracteres</div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="password_confirmation">Confirmar contraseña</label>
+          <div class="password-input-container">
+            <input
+              [type]="hideConfirmPassword ? 'password' : 'text'"
+              formControlName="password_confirmation"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f['password_confirmation'].errors }"
+              placeholder="Confirma tu contraseña"
+            />
+            <button 
+              type="button" 
+              class="password-toggle"
+              (click)="togglePasswordVisibility('confirm')"
+            >
+              <i class="bi" [ngClass]="hideConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+          <div *ngIf="submitted && f['password_confirmation'].errors" class="invalid-feedback">
+            <div *ngIf="f['password_confirmation'].errors['required']">Confirma tu contraseña</div>
+            <div *ngIf="f['password_confirmation'].errors['passwordMismatch']">Las contraseñas no coinciden</div>
+          </div>
+        </div>
+  
+        <button [disabled]="loading" class="btn btn-primary w-100 mt-3">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+          Crear cuenta
+        </button>
+  
+        <div class="auth-footer">
+          <p>¿Ya tienes una cuenta? <a routerLink="/auth/login">Inicia sesión</a></p>
+        </div>
+      </form>
+    </div>
+  </div>

@@ -3,18 +3,23 @@ import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
-  HttpInterceptor
+  HttpInterceptor,
+  HttpErrorResponse
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { JwtService } from './jwt.service';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
-
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const token = this.jwtService.getToken();
+    const token = this.authService.getToken();
     
     if (token) {
       request = request.clone({
@@ -24,6 +29,18 @@ export class TokenInterceptor implements HttpInterceptor {
       });
     }
     
-    return next.handle(request);
+    return next.handle(request).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          // Token expirado o inválido
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+          this.router.navigate(['/auth/login'], {
+            queryParams: { expired: 'true' }
+          });
+        }
+        return throwError(() => error);
+      })
+    );
   }
 }

@@ -1,37 +1,19 @@
 import { Routes } from '@angular/router';
-import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
-import { authGuard } from './core/auth/auth.guard';
+import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { AuthGuard }           from './core/auth/auth.guard';
 
-export const routes: Routes = [
+export const AppRoutes: Routes = [
+  {
+    path: 'auth',
+    component: AuthLayoutComponent,
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+  },
   {
     path: '',
     component: MainLayoutComponent,
-    children: [
-      {
-        path: '',
-        loadChildren: () => import('./features/home/home.routes').then(r => r.HOME_ROUTES)
-      },
-      {
-        path: 'account',
-        canActivate: [authGuard],
-        loadChildren: () => import('./features/auth/auth.routes').then(r => r.AUTH_ROUTES)
-      }
-    ]
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule)
   },
-  {
-    path: '',
-    component: AuthLayoutComponent,
-    children: [
-      {
-        path: 'login',
-        loadComponent: () => import('./features/auth/login/login.component').then(c => c.LoginComponent)
-      },
-      {
-        path: 'register',
-        loadComponent: () => import('./features/auth/register/register.component').then(c => c.RegisterComponent)
-      }
-    ]
-  },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: 'auth/login' }
 ];
