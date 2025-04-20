@@ -1,14 +1,13 @@
-// admin-layout.module.ts
-import { SharedModule } from '../shared/shared.module';
+import { Component } from '@angular/core';
+import { HeaderComponent } from "../../shared/components/header/header.component";
+import { FooterComponent } from "../../shared/components/footer/footer.component";
 
-@NgModule({
-  declarations: [
-    AdminLayoutComponent
-  ],
-  imports: [
-    CommonModule,
-    SharedModule,  // Agrega este import
-    // otros imports...
-  ]
+@Component({
+  selector: 'app-admin-layout',
+  templateUrl: './admin-layout.component.html',
+  styleUrls: ['./admin-layout.component.scss'],
+  imports: [HeaderComponent, FooterComponent]
 })
-export class AdminLayoutModule { 
+export class AdminLayoutComponent {
+
+}
