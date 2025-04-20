@@ -15,14 +15,13 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/flask-ecommerce-frontend",
             "index": "src/index.html",
-            "browser": "src/main.ts",
-            
+            "main": "src/main.ts",
             "polyfills": [
-              "zone.js"
+              "src/polyfills.ts"
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -69,12 +68,15 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "flask-ecommerce-frontend:build"
+          },
           "configurations": {
             "production": {
-              "buildTarget": "flask-ecommerce-frontend:build:production"
+              "browserTarget": "flask-ecommerce-frontend:build:production"
             },
             "development": {
-              "buildTarget": "flask-ecommerce-frontend:build:development"
+              "browserTarget": "flask-ecommerce-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
