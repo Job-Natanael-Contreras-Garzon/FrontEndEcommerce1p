@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService }       from '../../../core/services/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { AlertComponent } from "../../../shared/components/alert/alert.component";
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  imports: [AlertComponent]
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
