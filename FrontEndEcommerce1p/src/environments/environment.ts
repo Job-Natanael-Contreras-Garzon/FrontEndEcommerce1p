@@ -1,5 +1,4 @@
-// src/environments/environment.ts
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8000/api'  // ajusta al endpoint de tu Django
+  apiUrl: 'http://192.168.100.8:5001'  // Sin /api al final
 };

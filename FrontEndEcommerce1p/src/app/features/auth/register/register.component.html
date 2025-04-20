@@ -3,40 +3,35 @@
   <div class="shape"></div>
 </div>
 <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-  <h3>Register Here</h3>
+  <h3>Registrarse</h3>
   
-  <label for="name">Full Name</label>
-  <input type="text" placeholder="Enter your name" id="name" formControlName="name">
-  <div *ngIf="submitted && f['name'].errors" class="error-message">
-    <div *ngIf="f['name'].errors['required']">Name is required</div>
+  <label for="username">Username</label>
+  <input type="text" placeholder="Enter your username" id="username" formControlName="username" autocomplete="username"/>
+  <div *ngIf="submitted && f['username'].errors" class="error-message">
+    <div *ngIf="f['username'].errors['required']">Username is required</div>
   </div>
-  
+
   <label for="email">Email</label>
-  <input type="text" placeholder="Email address" id="email" formControlName="email">
+  <input type="email" placeholder="Enter your email" id="email" formControlName="email" autocomplete="email"/>
   <div *ngIf="submitted && f['email'].errors" class="error-message">
     <div *ngIf="f['email'].errors['required']">Email is required</div>
     <div *ngIf="f['email'].errors['email']">Enter a valid email address</div>
   </div>
   
   <label for="password">Password</label>
-  <div class="password-container">
-    <input [type]="hidePassword ? 'password' : 'text'" placeholder="Create password" id="password" formControlName="password">
-    
-  </div>
+  <input type="password" placeholder="Enter your password" id="password" formControlName="password" autocomplete="new-password"/>
   <div *ngIf="submitted && f['password'].errors" class="error-message">
     <div *ngIf="f['password'].errors['required']">Password is required</div>
     <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</div>
   </div>
-  
+
   <button type="submit" [disabled]="loading">
     <span *ngIf="loading" class="spinner"></span>
     <span *ngIf="!loading">Register</span>
   </button>
-  
   <div class="login-link">
-    <a routerLink="/auth/login">Already have an account? Login</a>
+    <a routerLink="/auth/login">Already have an account? Log in</a>
   </div>
-  
   <div *ngIf="error" class="alert-error">
     {{ error }}
   </div>

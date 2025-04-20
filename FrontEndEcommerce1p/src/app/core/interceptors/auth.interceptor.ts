@@ -5,25 +5,24 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 @Injectable()
-export class TokenInterceptor implements HttpInterceptor {
+export class AuthInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Add withCredentials for CORS
-    let newRequest = req.clone({
-      withCredentials: true
+    let newReq = req.clone({
+      withCredentials: true,
+      headers: req.headers
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
     });
-
-    // Add token if available
+    
     const token = this.auth.getToken();
     if (token) {
-      newRequest = newRequest.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
+      newReq = newReq.clone({
+        headers: newReq.headers.set('Authorization', `Bearer ${token}`)
       });
     }
-
-    return next.handle(newRequest);
+    
+    return next.handle(newReq);
   }
 }

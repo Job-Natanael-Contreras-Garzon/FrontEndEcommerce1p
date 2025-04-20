@@ -2,21 +2,19 @@
   <div class="shape"></div>
   <div class="shape"></div>
 </div>
+
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
   <h3>Login Here</h3>
   
-  <label for="username">Username</label>
-  <input type="text" placeholder="Email" id="username" formControlName="email">
+  <label for="email">Email</label>
+  <input type="email" placeholder="Email" id="email" formControlName="email" autocomplete="username"/>
   <div *ngIf="submitted && f['email'].errors" class="error-message">
     <div *ngIf="f['email'].errors['required']">Email is required</div>
     <div *ngIf="f['email'].errors['email']">Enter a valid email address</div>
   </div>
   
   <label for="password">Password</label>
-  <div class="password-container">
-    <input [type]="hidePassword ? 'password' : 'text'" placeholder="Password" id="password" formControlName="password">
-    
-  </div>
+  <input [type]="hidePassword ? 'password' : 'text'" placeholder="Password" id="password" formControlName="password" autocomplete="current-password"/>
   <div *ngIf="submitted && f['password'].errors" class="error-message">
     <div *ngIf="f['password'].errors['required']">Password is required</div>
   </div>

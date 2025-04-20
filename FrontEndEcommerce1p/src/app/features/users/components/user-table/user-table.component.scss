@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
+:host {
+  display: block;
+  height: calc(100vh - 64px);
+  font-family: 'Varela Round', sans-serif;
+}
+
+// ...copy the rest of the styles from product-table.component.scss...
+
+.role-filter {
+  min-width: 150px;
+  
+  @media (max-width: 768px) {
+    min-width: 120px;
+  }
+}
