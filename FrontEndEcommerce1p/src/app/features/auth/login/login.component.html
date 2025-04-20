@@ -6,7 +6,7 @@
   <h3>Login Here</h3>
   
   <label for="username">Username</label>
-  <input type="text" placeholder="Email or Phone" id="username" formControlName="email">
+  <input type="text" placeholder="Email" id="username" formControlName="email">
   <div *ngIf="submitted && f['email'].errors" class="error-message">
     <div *ngIf="f['email'].errors['required']">Email is required</div>
     <div *ngIf="f['email'].errors['email']">Enter a valid email address</div>
