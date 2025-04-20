@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
+:host {
+  display: block;
+  height: calc(100vh - 64px); // Ajusta este valor según el tamaño de tu header
+  font-family: 'Varela Round', sans-serif;
+}
+
+.container {
+  height: 100%;
+  padding: 20px;
+  background-color: #f5f5f5;
+  
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
+}
+
+.table-wrapper {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+  height: calc(100% - 40px);
+  display: flex;
+  flex-direction: column;
+  
+  @media (max-width: 768px) {
+    padding: 10px;
+    height: calc(100% - 20px);
+  }
+}
+
+.table-title {
+  background: #299be4;
+  color: #fff;
+  margin: -20px -20px 10px;
+  padding: 15px 20px;
+  border-radius: 8px 8px 0 0;
+
+  @media (max-width: 768px) {
+    margin: -10px -10px 10px;
+    padding: 10px;
+  }
+
+  h2 {
+    margin: 5px 0 0;
+    font-size: 24px;
+
+    @media (max-width: 768px) {
+      font-size: 20px;
+    }
+  }
+
+  .btn {
+    min-width: 100px;
+    margin-left: 10px;
+    
+    @media (max-width: 768px) {
+      min-width: auto;
+      margin-left: 5px;
+      padding: 5px 10px;
+    }
+  }
+}
+
+.table-container {
+  flex: 1;
+  overflow: auto;
+  min-height: 300px; // Altura mínima cuando no hay datos
+}
+
+table.table {
+  margin-bottom: 0;
+  min-width: 1000px; // Asegura scroll horizontal en móviles
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+  }
+
+  th, td {
+    padding: 12px 15px;
+    vertical-align: middle;
+
+    @media (max-width: 768px) {
+      padding: 8px 10px;
+    }
+  }
+
+  tbody tr {
+    &:nth-of-type(odd) {
+      background-color: rgba(0, 0, 0, .02);
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, .05);
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #666;
+
+  i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #ccc;
+  }
+}
+
+.pagination-container {
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hint-text {
+    margin: 0;
+  }
+
+  .pagination {
+    margin: 0;
+
+    .page-link {
+      padding: 6px 12px;
+      min-width: 35px;
+      text-align: center;
+    }
+  }
+}

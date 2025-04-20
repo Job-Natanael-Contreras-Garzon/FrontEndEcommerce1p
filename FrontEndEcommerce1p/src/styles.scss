@@ -2,3 +2,36 @@
 
 html, body { height: 100%; background-color: #141414; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #141414;
+  min-height: 100vh;
+}
+
+.btn {
+  transition: all 0.2s;
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.page-link {
+  cursor: pointer;
+}
+
+/* Asegúrate que la tabla sea responsive en dispositivos móviles */
+@media (max-width: 768px) {
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

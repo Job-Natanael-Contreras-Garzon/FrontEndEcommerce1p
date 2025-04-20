@@ -1,0 +1,54 @@
+
+
+2. Gestión de Usuarios
+Vista: Lista de Usuarios
+Objetivo : Mostrar todos los usuarios registrados y permitir su edición o eliminación.
+Layout :
+Tabla :
+Columnas: ID, Nombre de usuario, Email, Roles, Acciones (editar/eliminar).
+Opciones de filtrado por rol (admin/usuario).
+Botón "Nuevo Usuario" para agregar uno nuevo.
++----------------+------------------+-------------------+--------+----------+
+| ID             | Username         | Email             | Roles  | Acciones |
++----------------+------------------+-------------------+--------+----------+
+| 60d21b4667...  | usuario123       | usuario@ejemplo.com| Admin  | ✏️ 🗑️   |
++----------------+------------------+-------------------+--------+----------+
+3. Gestión de Categorías
+Vista: Lista de Categorías
+Objetivo : Mostrar todas las categorías disponibles y permitir su creación, edición o eliminación.
+Layout :
+Tabla :
+Columnas: ID, Nombre, Descripción, Acciones (editar/eliminar).
+Botón "Nueva Categoría" para agregar una nueva.
++----------------+-------------+---------------------+----------+
+| ID             | Nombre      | Descripción         | Acciones |
++----------------+-------------+---------------------+----------+
+| 60d21b4667...  | Electrónica | Productos electrónicos | ✏️ 🗑️   |
++----------------+-------------+---------------------+----------+
+4. Gestión de Productos
+Vista: Lista de Productos
+Objetivo : Mostrar todos los productos disponibles y permitir su creación, edición o eliminación.
+Layout :
+Tabla :
+Columnas: ID, Nombre, Precio, Categoría, Stock, Imagen, Acciones (editar/eliminar).
+Filtros: Por categoría, precio, stock.
+Botón "Nuevo Producto" para agregar uno nuevo.
+
++----------------+---------------+-------+-------------+-------+----------+----------+
+| ID             | Nombre        | Precio| Categoría   | Stock | Imagen   | Acciones |
++----------------+---------------+-------+-------------+-------+----------+----------+
+| 60d21b4667...  | Smartphone XYZ| 599.99| Electrónica  | 50    | [🔗]     | ✏️ 🗑️   |
++----------------+---------------+-------+-------------+-------+----------+----------+
+5. Gestión de Órdenes/Pedidos
+Vista: Lista de Órdenes
+Objetivo : Mostrar todas las órdenes realizadas y permitir su gestión.
+Layout :
+Tabla :
+Columnas: ID, Usuario, Fecha, Total, Estado, Dirección de envío, Acciones (ver detalles/editar estado).
+Filtros: Por estado (pendiente/completado), fecha.
+
++----------------+-------------+------------+---------+----------+----------------+----------+
+| ID             | Usuario     | Fecha      | Total   | Estado   | Dirección      | Acciones |
++----------------+-------------+------------+---------+----------+----------------+----------+
+| 60d21b4667...  | usuario123  | 2023-06-20 | $599.99 | Pendiente| Calle Principal| ✏️ 🔍   |
++----------------+-------------+------------+---------+----------+----------------+----------+
