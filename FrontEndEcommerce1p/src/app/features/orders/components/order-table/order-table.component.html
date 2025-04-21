@@ -1,1 +1,125 @@
-<p>order-table works!</p>
+<div class="mat-elevation-z8">
+  <div class="table-header">
+    <div class="filters">
+      <mat-form-field>
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. user123" #input>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilters()">
+          <mat-option value="">All</mat-option>
+          <mat-option *ngFor="let status of orderStatuses" [value]="status">
+            {{status}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Start date</mat-label>
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate" (dateChange)="applyFilters()">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>End date</mat-label>
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate" (dateChange)="applyFilters()">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    
+    <div class="header-buttons">
+      <button mat-raised-button color="accent" (click)="exportToExcel()" [disabled]="!dataSource.data.length">
+        <mat-icon>download</mat-icon>
+        Export Excel
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-shade" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <div class="table-container">
+    <mat-table [dataSource]="dataSource" matSort>
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+        <mat-cell *matCellDef="let order"> {{order.id}} </mat-cell>
+      </ng-container>
+
+      <!-- User Column -->
+      <ng-container matColumnDef="user">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> User </mat-header-cell>
+        <mat-cell *matCellDef="let order"> {{order.user}} </mat-cell>
+      </ng-container>
+
+      <!-- Date Column -->
+      <ng-container matColumnDef="date">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Date </mat-header-cell>
+        <mat-cell *matCellDef="let order"> {{order.date | date}} </mat-cell>
+      </ng-container>
+
+      <!-- Total Column -->
+      <ng-container matColumnDef="total">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Total </mat-header-cell>
+        <mat-cell *matCellDef="let order"> {{order.total | currency}} </mat-cell>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
+        <mat-cell *matCellDef="let order">
+          <span class="status-badge" [class.pending]="order.status === 'Pending'"
+                                   [class.processing]="order.status === 'Processing'"
+                                   [class.shipped]="order.status === 'Shipped'"
+                                   [class.delivered]="order.status === 'Delivered'"
+                                   [class.cancelled]="order.status === 'Cancelled'">
+            {{order.status}}
+          </span>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Shipping Address Column -->
+      <ng-container matColumnDef="shippingAddress">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Shipping Address </mat-header-cell>
+        <mat-cell *matCellDef="let order"> {{order.shippingAddress}} </mat-cell>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+        <mat-cell *matCellDef="let order">
+          <button mat-icon-button color="primary" (click)="openEditDialog(order)" matTooltip="Edit Status">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="accent" (click)="openDetailsDialog(order)" matTooltip="View Details">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+      <!-- Row shown when no data matches the filter -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="7">
+          <div class="no-data-message">
+            <mat-icon>search_off</mat-icon>
+            <p>No data matching the filter "{{input.value}}"</p>
+          </div>
+        </td>
+      </tr>
+    </mat-table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of orders"></mat-paginator>
+  </div>
+</div>
