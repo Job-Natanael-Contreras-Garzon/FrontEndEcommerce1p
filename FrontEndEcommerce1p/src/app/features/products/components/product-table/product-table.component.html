@@ -1,95 +1,83 @@
-<div class="container">
-    <div class="table-wrapper">
-      <div class="table-title">
-        <div class="d-flex justify-content-between align-items-center">
-          <h2>Product <b>Management</b></h2>
-          <div>
-            <button class="btn btn-light" (click)="exportExcel()">
-              <i class="bi bi-file-earmark-excel"></i>
-              <span class="d-none d-sm-inline"> Export</span>
-            </button>
-            <button class="btn btn-light" (click)="addProduct()">
-              <i class="bi bi-plus-circle"></i>
-              <span class="d-none d-sm-inline"> Add New</span>
-            </button>
-          </div>
-        </div>
-      </div>
-  
-      <div class="table-container">
-        <table class="table table-hover" *ngIf="products.length > 0">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Price</th>
-              <th>Category</th>
-              <th>Stock</th>
-              <th>Image</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let product of products; let i = index">
-              <td>{{ (page - 1) * pageSize + i + 1 }}</td>
-              <td>{{ product.name }}</td>
-              <td>{{ product.price | currency:'USD' }}</td>
-              <td>{{ product.category }}</td>
-              <td>
-                <span [ngClass]="{
-                  'badge bg-success': product.stock > 10,
-                  'badge bg-warning': product.stock <= 10 && product.stock > 0,
-                  'badge bg-danger': product.stock === 0
-                }">
-                  {{ product.stock }}
-                </span>
-              </td>
-              <td>
-                <img [src]="product.imageUrl || 'assets/placeholder.png'"
-                     [alt]="product.name"
-                     class="rounded-circle"
-                     width="40"
-                     height="40">
-              </td>
-              <td>
-                <button class="btn btn-sm btn-light me-1" (click)="editProduct(product)">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-light" (click)="deleteProduct(product)">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-  
-        <div class="empty-state" *ngIf="products.length === 0">
-          <i class="bi bi-inbox"></i>
-          <p>No products found</p>
-          <button class="btn btn-primary" (click)="addProduct()">
-            Add your first product
-          </button>
-        </div>
-      </div>
-  
-      <div class="pagination-container">
-        <div class="hint-text">
-          Showing <b>{{ products.length }}</b> of <b>{{ total }}</b> entries
-        </div>
-        
-        <ul class="pagination">
-          <li class="page-item" [class.disabled]="page === 1">
-            <a class="page-link" (click)="prevPage()">Previous</a>
-          </li>
-          <li class="page-item" 
-              *ngFor="let p of pages" 
-              [class.active]="p === page">
-            <a class="page-link" (click)="goToPage(p)">{{ p }}</a>
-          </li>
-          <li class="page-item" [class.disabled]="page === pages.length">
-            <a class="page-link" (click)="nextPage()">Next</a>
-          </li>
-        </ul>
-      </div>
+<div class="mat-elevation-z8">
+  <div class="table-header">
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Laptop" #input>
+    </mat-form-field>
+    
+    <div class="header-buttons">
+      <button mat-raised-button color="primary" (click)="openAddDialog()">
+        <mat-icon>add</mat-icon>
+        Add Product
+      </button>
+      <button mat-raised-button color="accent" (click)="exportToExcel()" [disabled]="!dataSource.data.length">
+        <mat-icon>download</mat-icon>
+        Export Excel
+      </button>
     </div>
   </div>
+
+  <div class="loading-shade" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <div class="table-container">
+    <mat-table [dataSource]="dataSource" matSort>
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+        <mat-cell *matCellDef="let product"> {{product.id}} </mat-cell>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+        <mat-cell *matCellDef="let product"> {{product.name}} </mat-cell>
+      </ng-container>
+
+      <!-- Price Column -->
+      <ng-container matColumnDef="price">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Price </mat-header-cell>
+        <mat-cell *matCellDef="let product"> {{product.price | currency}} </mat-cell>
+      </ng-container>
+
+      <!-- Stock Column -->
+      <ng-container matColumnDef="stock">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Stock </mat-header-cell>
+        <mat-cell *matCellDef="let product"> {{product.stock}} </mat-cell>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+        <mat-cell *matCellDef="let product">
+          <button mat-icon-button color="primary" (click)="openEditDialog(product)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteProduct(product.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+      <!-- Row shown when no data matches the filter -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="5">
+          <div class="no-data-message">
+            <mat-icon>search_off</mat-icon>
+            <p>No data matching the filter "{{input.value}}"</p>
+          </div>
+        </td>
+      </tr>
+    </mat-table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of products"></mat-paginator>
+  </div>
+</div>

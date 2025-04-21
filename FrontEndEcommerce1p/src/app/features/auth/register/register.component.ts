@@ -24,7 +24,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
-      name: ['', Validators.required],
+      username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
     });
@@ -44,7 +44,7 @@ export class RegisterComponent implements OnInit {
     }
     this.loading = true;
     const registerData = {
-      name: this.registerForm.value.name,
+      username: this.registerForm.value.username,
       email: this.registerForm.value.email,
       password: this.registerForm.value.password,
     };
@@ -53,7 +53,7 @@ export class RegisterComponent implements OnInit {
         this.loading = false;
         if (response.user_id) {
           this.successMessage = 'Registro exitoso. Por favor inicia sesión.';
-          this.router.navigate(['/auth/login']);
+          this.router.navigate(['/auth/login/login']);
         } else {
           this.error = response.message || 'Error en registro';
         }

@@ -1,67 +1,114 @@
 // src/app/core/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { Router } from '@angular/router';
 
-export interface LoginResponse {
-  status: string;
-  message: string;
-  token: string;
-  user_id: number;
+interface AuthResponse {
+  success: boolean;
+  data: {
+    token: string;
+    refreshToken: string;
+    user: {
+      id: string;
+      username: string;
+      email: string;
+      roles: string[];
+    };
+  };
+  message?: string;
 }
 
-export interface RegisterResponse {
-  status: string;
-  message: string;
-  user_id: number;
-}
-
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  private baseUrl = environment.apiUrl;
-  private userIdSub = new BehaviorSubject<number | null>(null);
-  public userId$ = this.userIdSub.asObservable();
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
+  private currentUserSubject = new BehaviorSubject<any>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    const id = this.getUserId();
-    if (id) this.userIdSub.next(id);
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
+    this.loadStoredUser();
   }
 
-  login(data: { email: string; password: string }): Observable<LoginResponse> {
-    return this.http
-      .post<LoginResponse>(`${this.baseUrl}/login`, data)
+  private loadStoredUser(): void {
+    const token = localStorage.getItem(environment.tokenName);
+    const user = localStorage.getItem('currentUser');
+    if (token && user) {
+      this.currentUserSubject.next(JSON.parse(user));
+    }
+  }
+
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
-        tap(res => {
-          if (res.token) {
-            localStorage.setItem('token', res.token);
-            localStorage.setItem('user_id', String(res.user_id));
-            this.userIdSub.next(res.user_id);
+        tap(response => {
+          if (response.success) {
+            this.handleAuthSuccess(response);
           }
+        }),
+        catchError(error => {
+          console.error('Login error:', error);
+          return throwError(() => new Error(error.error?.message || 'Error during login'));
         })
       );
   }
 
-  register(data: { name: string; email: string; password: string }): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${this.baseUrl}/api/client/register`, data);
+  refreshToken(): Observable<string> {
+    const refreshToken = localStorage.getItem(environment.refreshTokenName);
+    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh-token`, { refreshToken })
+      .pipe(
+        tap(response => {
+          if (response.success) {
+            this.handleAuthSuccess(response);
+          }
+        }),
+        catchError(error => {
+          this.logout();
+          return throwError(() => new Error('Session expired. Please login again.'));
+        })
+      );
+  }
+
+  private handleAuthSuccess(response: AuthResponse): void {
+    const { token, refreshToken, user } = response.data;
+    localStorage.setItem(environment.tokenName, token);
+    localStorage.setItem(environment.refreshTokenName, refreshToken);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.currentUserSubject.next(user);
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user_id');
-  }
-
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    localStorage.removeItem(environment.tokenName);
+    localStorage.removeItem(environment.refreshTokenName);
+    localStorage.removeItem('currentUser');
+    this.currentUserSubject.next(null);
+    this.router.navigate(['/auth/login']);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem(environment.tokenName);
   }
 
-  getUserId(): number | null {
-    const id = localStorage.getItem('user_id');
-    return id ? +id : null;
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
+  hasRole(role: string): boolean {
+    const user = this.currentUserSubject.value;
+    return user?.roles?.includes(role) || false;
+  }
+
+  getUserRoles(): string[] {
+    return this.currentUserSubject.value?.roles || [];
+  }
+
+  getCurrentUser(): any {
+    return this.currentUserSubject.value;
   }
 }

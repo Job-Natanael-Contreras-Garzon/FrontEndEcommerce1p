@@ -8,7 +8,7 @@ import { Users, CreateUsersDTO, UpdateUsersDTO } from '../models/users.model';
   providedIn: 'root'
 })
 export class UsersService {
-  private apiUrl = `${environment.apiUrl}/users`;
+  private apiUrl = `${environment.apiUrl}/admin/users`;
 
   constructor(private http: HttpClient) {}
 
@@ -21,28 +21,22 @@ export class UsersService {
       params = params.set('role', role);
     }
 
-    const headers = new HttpHeaders().set('x-access-token', localStorage.getItem('token') || '');
-    
-    return this.http.get<{ users: Users[], total: number }>(this.apiUrl, { params, headers });
+    return this.http.get<{ users: Users[], total: number }>(this.apiUrl, { params });
   }
 
   getUser(id: string): Observable<Users> {
-    const headers = new HttpHeaders().set('x-access-token', localStorage.getItem('token') || '');
-    return this.http.get<Users>(`${this.apiUrl}/${id}`, { headers });
+    return this.http.get<Users>(`${this.apiUrl}/${id}`);
   }
 
   createUser(user: CreateUsersDTO): Observable<Users> {
-    const headers = new HttpHeaders().set('x-access-token', localStorage.getItem('token') || '');
-    return this.http.post<Users>(this.apiUrl, user, { headers });
+    return this.http.post<Users>(this.apiUrl, user);
   }
 
   updateUser(id: string, changes: UpdateUsersDTO): Observable<{ message: string }> {
-    const headers = new HttpHeaders().set('x-access-token', localStorage.getItem('token') || '');
-    return this.http.put<{ message: string }>(`${this.apiUrl}/${id}`, changes, { headers });
+    return this.http.put<{ message: string }>(`${this.apiUrl}/${id}`, changes);
   }
 
   deleteUser(id: string): Observable<{ message: string }> {
-    const headers = new HttpHeaders().set('x-access-token', localStorage.getItem('token') || '');
-    return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`, { headers });
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`);
   }
 }

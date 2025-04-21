@@ -8,15 +8,23 @@ import { FooterComponent } from './components/footer/footer.component';
 import { AlertComponent } from './components/alert/alert.component';
 import { DateFormatPipe } from './pipes/date-format.pipe';
 import { HasRoleDirective } from './directives/has-role.directive';
+
+// Material Modules
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatButtonModule,
+    MatToolbarModule,
+    MatCardModule
   ],
   declarations: [
     HeaderComponent,
@@ -33,8 +41,12 @@ import { MatDialogModule } from '@angular/material/dialog';
     AlertComponent,
     DateFormatPipe,
     HasRoleDirective,
+    // Export Material Modules
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatButtonModule,
+    MatToolbarModule,
+    MatCardModule
   ]
 })
 export class SharedModule { }

@@ -1,1 +1,49 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h2>Resumen</h2>
+    <button mat-icon-button (click)="loadDashboardStats()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando información del dashboard...</p>
+  </div>
+
+  <div *ngIf="!loading" class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-value">{{ totalProducts || 0 }}</div>
+        <div class="stat-label">Total Productos</div>
+      </mat-card-content>
+      <mat-card-footer>
+        <mat-icon>inventory_2</mat-icon>
+      </mat-card-footer>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-value">{{ totalUsers || 0 }}</div>
+        <div class="stat-label">Total Usuarios</div>
+      </mat-card-content>
+      <mat-card-footer>
+        <mat-icon>people</mat-icon>
+      </mat-card-footer>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-value">{{ totalOrders || 0 }}</div>
+        <div class="stat-label">Total Órdenes</div>
+      </mat-card-content>
+      <mat-card-footer>
+        <mat-icon>shopping_cart</mat-icon>
+      </mat-card-footer>
+    </mat-card>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+</div>

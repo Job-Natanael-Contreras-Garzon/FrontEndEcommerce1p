@@ -1,8 +1,11 @@
 {
-  "/api/client": {
+  "/api": {
     "target": "http://146.190.117.23:5001",
     "secure": false,
     "changeOrigin": true,
-    "logLevel": "debug"
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": ""
+    }
   }
 }

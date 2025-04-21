@@ -10,7 +10,7 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private apiUrl = `${environment.apiUrl}/products`;
+  private apiUrl = `${environment.apiUrl}admin/products`;
 
   constructor(private http: HttpClient) {}
 

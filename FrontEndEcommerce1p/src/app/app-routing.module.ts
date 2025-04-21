@@ -7,33 +7,22 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
 import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
-  // 1) redirige raíz → login
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
-
-  // 2) rutas de auth (login/register)
   {
     path: 'auth',
     component: AuthLayoutComponent,
     children: [
       {
-        path: 'login',
+        path: '',
         loadChildren: () =>
           import('./features/auth/auth.module').then((m) => m.AuthModule),
       },
-      {
-        path: 'register',
-        loadChildren: () =>
-          import('./features/auth/auth.module').then((m) => m.AuthModule),
-      },
-      { path: '**', redirectTo: 'login' },
     ],
   },
-
-  // 3) panel protegido
   {
     path: 'panel',
     component: AdminLayoutComponent,
     canActivate: [AuthGuard],
+    data: { roles: ['admin'] },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
@@ -43,7 +32,6 @@ const routes: Routes = [
             (m) => m.DashboardModule
           ),
       },
-      
       {
         path: 'products',
         loadChildren: () =>
@@ -72,12 +60,10 @@ const routes: Routes = [
             (m) => m.OrdersModule
           ),
       },
-      { path: '**', redirectTo: 'dashboard' },
     ],
   },
-
-  // 4) cualquier otra → login
-  { path: '**', redirectTo: 'auth/login' },
+  { path: '', redirectTo: '/panel/dashboard', pathMatch: 'full' },
+  { path: '**', redirectTo: '/panel/dashboard' },
 ];
 
 @NgModule({

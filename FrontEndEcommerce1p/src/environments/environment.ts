@@ -1,4 +1,6 @@
 export const environment = {
-  production: true,
-  apiUrl: 'http://146.190.117.23:5001/api/client'
+  production: false,
+  apiUrl: 'http://localhost:3000/api',
+  tokenName: 'access_token',
+  refreshTokenName: 'refresh_token'
 };
