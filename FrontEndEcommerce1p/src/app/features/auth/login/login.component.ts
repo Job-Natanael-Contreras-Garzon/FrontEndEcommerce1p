@@ -1,6 +1,7 @@
+// src/app/features/auth/login/login.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService, LoginResponse } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -11,7 +12,9 @@ import { Router } from '@angular/router';
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   loading = false;
+  submitted = false;
   error = '';
+  hidePassword = true;
 
   constructor(
     private fb: FormBuilder,
@@ -34,13 +37,20 @@ export class LoginComponent implements OnInit {
     return this.loginForm.controls;
   }
 
-  onSubmit(): void {
-    this.error = '';
-    if (this.loginForm.invalid) return;
+  togglePasswordVisibility(event: MouseEvent): void {
+    event.preventDefault();
+    this.hidePassword = !this.hidePassword;
+  }
 
+  onSubmit(): void {
+    this.submitted = true;
+    this.error = '';
+    if (this.loginForm.invalid) {
+      return;
+    }
     this.loading = true;
     this.auth.login(this.loginForm.value).subscribe({
-      next: (res) => {
+      next: (res: LoginResponse) => {
         this.loading = false;
         if (res.token) {
           this.router.navigate(['/panel']);
@@ -48,7 +58,7 @@ export class LoginComponent implements OnInit {
           this.error = res.message || 'Login failed';
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
         this.error = err.error?.message || 'Credenciales incorrectas';
       },

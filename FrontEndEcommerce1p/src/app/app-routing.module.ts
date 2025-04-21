@@ -43,6 +43,7 @@ const routes: Routes = [
             (m) => m.DashboardModule
           ),
       },
+      
       {
         path: 'products',
         loadChildren: () =>

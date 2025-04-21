@@ -1,3 +1,4 @@
+// src/app/core/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -8,6 +9,12 @@ export interface LoginResponse {
   status: string;
   message: string;
   token: string;
+  user_id: number;
+}
+
+export interface RegisterResponse {
+  status: string;
+  message: string;
   user_id: number;
 }
 
@@ -24,7 +31,7 @@ export class AuthService {
 
   login(data: { email: string; password: string }): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.baseUrl}/api/client/login`, data)
+      .post<LoginResponse>(`${this.baseUrl}/login`, data)
       .pipe(
         tap(res => {
           if (res.token) {
@@ -36,7 +43,11 @@ export class AuthService {
       );
   }
 
-  logout() {
+  register(data: { name: string; email: string; password: string }): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.baseUrl}/api/client/register`, data);
+  }
+
+  logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user_id');
   }
@@ -45,8 +56,12 @@ export class AuthService {
     return !!localStorage.getItem('token');
   }
 
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
   getUserId(): number | null {
-    const stored = localStorage.getItem('user_id');
-    return stored ? +stored : null;
+    const id = localStorage.getItem('user_id');
+    return id ? +id : null;
   }
 }

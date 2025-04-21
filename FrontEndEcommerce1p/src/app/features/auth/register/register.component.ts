@@ -1,19 +1,20 @@
+// src/app/features/auth/register/register.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService, RegisterResponse } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   loading = false;
   submitted = false;
   error = '';
-  hidePassword = true;
+  successMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -21,58 +22,46 @@ export class RegisterComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.registerForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(8)]],
     });
-    
-    // Redirect if already logged in
-    if (this.auth.isLoggedIn()) {
-      this.router.navigate(['/']);
-    }
   }
 
   get f() {
     return this.registerForm.controls;
   }
-  
-  togglePasswordVisibility(event: MouseEvent): void {
-    event.preventDefault();
-    this.hidePassword = !this.hidePassword;
-  }
 
-  onSubmit() {
+  onSubmit(): void {
     this.submitted = true;
     this.error = '';
-    
+    this.successMessage = '';
+
     if (this.registerForm.invalid) {
       return;
     }
-
     this.loading = true;
-    
     const registerData = {
       name: this.registerForm.value.name,
       email: this.registerForm.value.email,
-      password: this.registerForm.value.password
+      password: this.registerForm.value.password,
     };
-
     this.auth.register(registerData).subscribe({
-      next: (response) => {
-        if (response.status === 'success') {
-          // Registro exitoso, redirigir a login
+      next: (response: RegisterResponse) => {
+        this.loading = false;
+        if (response.user_id) {
+          this.successMessage = 'Registro exitoso. Por favor inicia sesión.';
           this.router.navigate(['/auth/login']);
         } else {
-          this.error = response.message || 'Registration failed';
-          this.loading = false;
+          this.error = response.message || 'Error en registro';
         }
       },
-      error: (err) => {
-        this.error = err.error?.message || 'Error en el registro';
+      error: (err: any) => {
         this.loading = false;
-      }
+        this.error = err.error?.message || 'Error en registro';
+      },
     });
   }
 }
