@@ -21,9 +21,10 @@ export class AdminAuthInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Don't intercept auth endpoints
     if (request.url.includes('/auth/')) {
-      return next.handle(request);
+      return next.handle(request.clone({
+        withCredentials: true
+      }));
     }
 
     const token = this.authService.getToken();
@@ -41,17 +42,15 @@ export class AdminAuthInterceptor implements HttpInterceptor {
           this.router.navigate(['/auth/login']);
         }
 
-        const errorMessage = error.error?.message || 'An error occurred';
-        return throwError(() => new Error(errorMessage));
+        return throwError(() => error);
       })
     );
   }
 
   private addToken(request: HttpRequest<any>, token: string): HttpRequest<any> {
     return request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
+      withCredentials: true,
+      headers: request.headers.set('Authorization', `Bearer ${token}`)
     });
   }
 

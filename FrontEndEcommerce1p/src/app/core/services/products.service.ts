@@ -15,7 +15,7 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class ProductsService {
-  private readonly apiUrl = `${environment.apiUrl}/admin/products`;
+  private readonly apiUrl = `${environment.apiUrl}/client/products`;
 
   constructor(private http: HttpClient) {}
 
@@ -34,12 +34,13 @@ export class ProductsService {
   }
 
   addProduct(product: Omit<Product, 'id'>): Observable<ApiResponse<Product>> {
-    return this.http.post<ApiResponse<Product>>(this.apiUrl, product)
+    return this.http.post<ApiResponse<Product>>(`${this.apiUrl}`, product)
       .pipe(catchError(this.handleError));
   }
 
   updateProduct(id: string | number, productData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/products/${id}`, productData);
+    return this.http.put<any>(`${this.apiUrl}/${id}`, productData)
+      .pipe(catchError(this.handleError));
   }
 
   deleteProduct(id: number): Observable<ApiResponse<void>> {
@@ -49,22 +50,16 @@ export class ProductsService {
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An error occurred';
-
     if (error.error instanceof ErrorEvent) {
-      // Client-side error
       errorMessage = error.error.message;
     } else {
-      // Server-side error
       errorMessage = error.error?.message || 'Server error';
-      
-      // Add status code context if available
       if (error.status === 404) {
         errorMessage = 'Product not found';
       } else if (error.status === 400) {
         errorMessage = error.error?.message || 'Invalid request';
       }
     }
-
     console.error('ProductsService Error:', error);
     return throwError(() => new Error(errorMessage));
   }

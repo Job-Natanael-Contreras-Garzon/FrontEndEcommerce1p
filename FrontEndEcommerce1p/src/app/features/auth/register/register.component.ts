@@ -1,13 +1,13 @@
 // src/app/features/auth/register/register.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService, RegisterResponse } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss'],
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
@@ -26,7 +26,7 @@ export class RegisterComponent implements OnInit {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
@@ -42,26 +42,30 @@ export class RegisterComponent implements OnInit {
     if (this.registerForm.invalid) {
       return;
     }
+
     this.loading = true;
     const registerData = {
       username: this.registerForm.value.username,
       email: this.registerForm.value.email,
-      password: this.registerForm.value.password,
+      password: this.registerForm.value.password
     };
+
     this.auth.register(registerData).subscribe({
-      next: (response: RegisterResponse) => {
+      next: (response) => {
         this.loading = false;
-        if (response.user_id) {
-          this.successMessage = 'Registro exitoso. Por favor inicia sesión.';
-          this.router.navigate(['/auth/login/login']);
+        if (response.success) {
+          this.successMessage = response.message || 'Registro exitoso. Por favor inicia sesión.';
+          setTimeout(() => {
+            this.router.navigate(['/auth/login']);
+          }, 2000);
         } else {
-          this.error = response.message || 'Error en registro';
+          this.error = response.message || 'Error en el registro';
         }
       },
-      error: (err: any) => {
+      error: (err) => {
         this.loading = false;
-        this.error = err.error?.message || 'Error en registro';
-      },
+        this.error = err.error?.message || 'Error en el registro';
+      }
     });
   }
 }

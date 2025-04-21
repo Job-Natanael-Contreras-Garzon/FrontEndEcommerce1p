@@ -29,14 +29,19 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
-    // Check for required roles
+    // Verificar roles requeridos
     const requiredRoles = route.data['roles'] as Array<string>;
     if (requiredRoles && requiredRoles.length > 0) {
       const userRoles = this.authService.getUserRoles();
       const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
       
       if (!hasRequiredRole) {
-        this.router.navigate(['/']);
+        // Si el usuario no tiene los roles requeridos, redirigir al dashboard o login
+        if (this.authService.isAuthenticated()) {
+          this.router.navigate(['/panel/dashboard']);
+        } else {
+          this.router.navigate(['/auth/login']);
+        }
         return false;
       }
     }

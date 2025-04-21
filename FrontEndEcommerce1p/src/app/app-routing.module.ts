@@ -22,7 +22,6 @@ const routes: Routes = [
     path: 'panel',
     component: AdminLayoutComponent,
     canActivate: [AuthGuard],
-    data: { roles: ['admin'] },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
@@ -62,8 +61,8 @@ const routes: Routes = [
       },
     ],
   },
-  { path: '', redirectTo: '/panel/dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: '/panel/dashboard' },
+  { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/auth/login' },
 ];
 
 @NgModule({

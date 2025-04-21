@@ -10,7 +10,7 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { AdminLayoutModule } from './layouts/admin-layout/admin-layout.module';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
-import { AdminAuthInterceptor } from './core/interceptors/admin-auth.interceptor';
+import { TokenInterceptor } from './core/interceptors/token.interceptor';
 
 @NgModule({
   declarations: [
@@ -29,7 +29,7 @@ import { AdminAuthInterceptor } from './core/interceptors/admin-auth.interceptor
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AdminAuthInterceptor,
+      useClass: TokenInterceptor,
       multi: true
     }
   ],

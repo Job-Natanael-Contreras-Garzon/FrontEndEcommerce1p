@@ -31,10 +31,14 @@ export class UserTableComponent implements OnInit {
   loadUsers() {
     this.loading = true;
     this.usersService.getUsers(this.page, this.pageSize, this.selectedRole).subscribe({
-      next: ({ users, total }) => {
-        this.users = users;
-        this.total = total;
-        this.calcPages();
+      next: (response) => {
+        if (response.success) {
+          this.users = response.data.users;
+          this.total = response.data.total;
+          this.calcPages();
+        } else {
+          this.error = response.message || 'Error loading users';
+        }
         this.loading = false;
       },
       error: (err) => {

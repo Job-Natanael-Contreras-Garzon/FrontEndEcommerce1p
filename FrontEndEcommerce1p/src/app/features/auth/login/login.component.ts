@@ -1,14 +1,13 @@
 // src/app/features/auth/login/login.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
-import { LoginResponse } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
@@ -26,7 +25,7 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      password: ['', Validators.required]
     });
 
     if (this.auth.isAuthenticated()) {
@@ -46,24 +45,27 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     this.submitted = true;
     this.error = '';
+
     if (this.loginForm.invalid) {
       return;
     }
+
     this.loading = true;
-    
     const { email, password } = this.loginForm.value;
+    
     this.auth.login(email, password).subscribe({
-      next: (res) => { // Aquí no especificamos tipo para que TypeScript lo infiera
+      next: (response) => {
         this.loading = false;
-        if (res.success && res.data?.token) {
+        if (response.success) {
           this.router.navigate(['/panel']);
         } else {
-          this.error = res.message || 'Login failed';
+          this.error = response.message || 'Error en el inicio de sesión';
         }
       },
-      error: (err: any) => {
+      error: (err) => {
         this.loading = false;
         this.error = err.error?.message || 'Credenciales incorrectas';
-      },
+      }
     });
-  }}
+  }
+}
