@@ -1,1 +1,67 @@
-<p>sidebar works!</p>
+<nav class="l-navbar" [class.show]="opened" id="nav-bar">
+    <div class="nav">
+      <!-- Logo / Título -->
+      <a
+        routerLink="/panel/dashboard"
+        class="nav_logo"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <i class="bx bx-layer nav_logo-icon"></i>
+        <span class="nav_logo-name">E‑Admin</span>
+      </a>
+  
+      <!-- Enlaces -->
+      <div class="nav_list">
+        <a
+          routerLink="/panel/dashboard"
+          routerLinkActive="active"
+          class="nav_link"
+        >
+          <i class="bx bx-grid-alt nav_icon"></i>
+          <span class="nav_name">Dashboard</span>
+        </a>
+        <a
+          routerLink="/panel/products"
+          routerLinkActive="active"
+          class="nav_link"
+        >
+          <i class="bx bx-folder nav_icon"></i>
+          <span class="nav_name">Productos</span>
+        </a>
+        <a
+          routerLink="/panel/categories"
+          routerLinkActive="active"
+          class="nav_link"
+        >
+          <i class="bx bx-category nav_icon"></i>
+          <span class="nav_name">Categorías</span>
+        </a>
+        <a
+          routerLink="/panel/users"
+          routerLinkActive="active"
+          class="nav_link"
+        >
+          <i class="bx bx-user nav_icon"></i>
+          <span class="nav_name">Usuarios</span>
+        </a>
+        <a
+          routerLink="/panel/orders"
+          routerLinkActive="active"
+          class="nav_link"
+        >
+          <i class="bx bx-cart nav_icon"></i>
+          <span class="nav_name">Órdenes</span>
+        </a>
+      </div>
+  
+      <!-- Logout al fondo -->
+      <div class="nav_footer">
+        <button class="nav_link" (click)="logout()">
+          <i class="bx bx-log-out nav_icon"></i>
+          <span class="nav_name">Salir</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  

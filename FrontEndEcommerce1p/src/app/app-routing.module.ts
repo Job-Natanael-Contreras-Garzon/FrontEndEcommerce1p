@@ -1,24 +1,86 @@
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+
+import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
+import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
+
 import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
+  // 1) redirige raíz → login
+  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+
+  // 2) rutas de auth (login/register)
   {
     path: 'auth',
-    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+    component: AuthLayoutComponent,
+    children: [
+      {
+        path: 'login',
+        loadChildren: () =>
+          import('./features/auth/auth.module').then((m) => m.AuthModule),
+      },
+      {
+        path: 'register',
+        loadChildren: () =>
+          import('./features/auth/auth.module').then((m) => m.AuthModule),
+      },
+      { path: '**', redirectTo: 'login' },
+    ],
   },
+
+  // 3) panel protegido
   {
     path: 'panel',
+    component: AdminLayoutComponent,
     canActivate: [AuthGuard],
-    loadChildren: () => import('./features/panel/panel.module').then(m => m.PanelModule)
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadChildren: () =>
+          import('./features/dashboard/dashboard.module').then(
+            (m) => m.DashboardModule
+          ),
+      },
+      {
+        path: 'products',
+        loadChildren: () =>
+          import('./features/products/products.module').then(
+            (m) => m.ProductsModule
+          ),
+      },
+      {
+        path: 'categories',
+        loadChildren: () =>
+          import('./features/categories/categories.module').then(
+            (m) => m.CategoriesModule
+          ),
+      },
+      {
+        path: 'users',
+        loadChildren: () =>
+          import('./features/users/users.module').then(
+            (m) => m.UsersModule
+          ),
+      },
+      {
+        path: 'orders',
+        loadChildren: () =>
+          import('./features/orders/orders.module').then(
+            (m) => m.OrdersModule
+          ),
+      },
+      { path: '**', redirectTo: 'dashboard' },
+    ],
   },
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'auth/login' }
+
+  // 4) cualquier otra → login
+  { path: '**', redirectTo: 'auth/login' },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

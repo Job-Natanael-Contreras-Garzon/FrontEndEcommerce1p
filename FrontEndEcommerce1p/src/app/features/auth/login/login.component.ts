@@ -1,19 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   loading = false;
-  submitted = false;
   error = '';
-  hidePassword = true;
 
   constructor(
     private fb: FormBuilder,
@@ -22,41 +20,38 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.auth.isLoggedIn()) {
-      this.router.navigate(['/panel/dashboard']);
-      return;
-    }
-
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
     });
+
+    if (this.auth.isLoggedIn()) {
+      this.router.navigate(['/panel']);
+    }
   }
 
-  // Getter para acceder fácilmente a los campos del formulario
   get f() {
     return this.loginForm.controls;
   }
 
   onSubmit(): void {
-    this.submitted = true;
     this.error = '';
-    
-    if (this.loginForm.invalid) {
-      return;
-    }
+    if (this.loginForm.invalid) return;
 
     this.loading = true;
-
     this.auth.login(this.loginForm.value).subscribe({
-      next: (response) => {
+      next: (res) => {
         this.loading = false;
-        // La redirección se maneja en el servicio de auth
+        if (res.token) {
+          this.router.navigate(['/panel']);
+        } else {
+          this.error = res.message || 'Login failed';
+        }
       },
       error: (err) => {
-        this.error = err.error?.message || 'Error al iniciar sesión';
         this.loading = false;
-      }
+        this.error = err.error?.message || 'Credenciales incorrectas';
+      },
     });
   }
 }
