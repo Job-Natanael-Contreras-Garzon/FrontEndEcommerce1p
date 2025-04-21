@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 
@@ -20,19 +20,43 @@ interface AuthResponse {
   };
   message?: string;
 }
+export interface LoginResponse {
+  success: boolean;
+  data: {
+    token: string;
+    refreshToken: string;
+    user: {
+      id: string;
+      username: string;
+      email: string;
+      roles: string[];
+    };
+  };
+  message?: string;
+}
+export interface LoginResponse {
+  success: boolean;
+  token: string;
+  refreshToken?: string;
+  user?: any;
+  message?: string;
+}
+export interface RegisterResponse {
+  success: boolean;
+  user_id?: string;
+  message?: string;
+}
+
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
+  constructor(private http: HttpClient, private router: Router) {
     this.loadStoredUser();
   }
 
@@ -45,36 +69,43 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
-        tap(response => {
+        tap((response) => {
           if (response.success) {
             this.handleAuthSuccess(response);
           }
         }),
-        catchError(error => {
+        catchError((error) => {
           console.error('Login error:', error);
-          return throwError(() => new Error(error.error?.message || 'Error during login'));
+          return throwError(
+            () => new Error(error.error?.message || 'Error during login')
+          );
         })
       );
   }
 
   refreshToken(): Observable<string> {
     const refreshToken = localStorage.getItem(environment.refreshTokenName);
-    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh-token`, { refreshToken })
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/refresh-token`, { refreshToken })
       .pipe(
-        tap(response => {
+        map((response) => {
           if (response.success) {
             this.handleAuthSuccess(response);
+            return response.data.token; // Devuelve el token como string
           }
+          throw new Error(response.message || 'Token refresh failed');
         }),
-        catchError(error => {
+        catchError((error) => {
           this.logout();
-          return throwError(() => new Error('Session expired. Please login again.'));
+          return throwError(
+            () => new Error('Session expired. Please login again.')
+          );
         })
       );
   }
-
   private handleAuthSuccess(response: AuthResponse): void {
     const { token, refreshToken, user } = response.data;
     localStorage.setItem(environment.tokenName, token);
@@ -108,6 +139,18 @@ export class AuthService {
     return this.currentUserSubject.value?.roles || [];
   }
 
+  register(userData: any): Observable<RegisterResponse> {
+    return this.http
+      .post<RegisterResponse>(`${this.apiUrl}/register`, userData)
+      .pipe(
+        catchError((error) => {
+          console.error('Registration error:', error);
+          return throwError(
+            () => new Error(error.error?.message || 'Error during registration')
+          );
+        })
+      );
+  }
   getCurrentUser(): any {
     return this.currentUserSubject.value;
   }

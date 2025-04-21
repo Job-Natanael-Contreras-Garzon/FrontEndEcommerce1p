@@ -99,7 +99,7 @@ export class ProductTableComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.productsService.updateProduct(product.id, result).subscribe({
+        this.productsService.updateProduct(Number(product.id), result).subscribe({
           next: (response) => {
             if (response.success) {
               this.snackBar.open('Product updated successfully', 'Close', { duration: 3000 });

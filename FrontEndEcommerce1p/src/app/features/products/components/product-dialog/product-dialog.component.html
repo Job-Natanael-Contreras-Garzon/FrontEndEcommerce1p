@@ -19,7 +19,7 @@
           <mat-form-field appearance="outline">
             <mat-label>Price</mat-label>
             <input matInput type="number" formControlName="price" placeholder="Enter price" min="0">
-            <mat-prefix>$&nbsp;</mat-prefix>
+            <span matPrefix>$&nbsp;</span>
             <mat-error>{{ getErrorMessage('price') }}</mat-error>
           </mat-form-field>
 

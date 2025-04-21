@@ -38,9 +38,8 @@ export class ProductsService {
       .pipe(catchError(this.handleError));
   }
 
-  updateProduct(id: number, product: Partial<Product>): Observable<ApiResponse<Product>> {
-    return this.http.put<ApiResponse<Product>>(`${this.apiUrl}/${id}`, product)
-      .pipe(catchError(this.handleError));
+  updateProduct(id: string | number, productData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/products/${id}`, productData);
   }
 
   deleteProduct(id: number): Observable<ApiResponse<void>> {

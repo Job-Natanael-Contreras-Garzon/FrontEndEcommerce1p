@@ -1,7 +1,8 @@
 // src/app/features/auth/login/login.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService, LoginResponse } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { LoginResponse } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -28,7 +29,7 @@ export class LoginComponent implements OnInit {
       password: ['', Validators.required],
     });
 
-    if (this.auth.isLoggedIn()) {
+    if (this.auth.isAuthenticated()) {
       this.router.navigate(['/panel']);
     }
   }
@@ -49,10 +50,12 @@ export class LoginComponent implements OnInit {
       return;
     }
     this.loading = true;
-    this.auth.login(this.loginForm.value).subscribe({
-      next: (res: LoginResponse) => {
+    
+    const { email, password } = this.loginForm.value;
+    this.auth.login(email, password).subscribe({
+      next: (res) => { // Aquí no especificamos tipo para que TypeScript lo infiera
         this.loading = false;
-        if (res.token) {
+        if (res.success && res.data?.token) {
           this.router.navigate(['/panel']);
         } else {
           this.error = res.message || 'Login failed';
@@ -63,5 +66,4 @@ export class LoginComponent implements OnInit {
         this.error = err.error?.message || 'Credenciales incorrectas';
       },
     });
-  }
-}
+  }}
