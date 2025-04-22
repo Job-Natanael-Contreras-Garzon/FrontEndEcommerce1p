@@ -99,7 +99,7 @@ export class ProductTableComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.productsService.updateProduct(Number(product.id), result).subscribe({
+        this.productsService.updateProduct(product.id, result).subscribe({
           next: (response) => {
             if (response.success) {
               this.snackBar.open('Product updated successfully', 'Close', { duration: 3000 });
@@ -116,7 +116,7 @@ export class ProductTableComponent implements OnInit {
     });
   }
 
-  deleteProduct(id: number): void {
+  deleteProduct(id: string): void {
     if (confirm('Are you sure you want to delete this product?')) {
       this.productsService.deleteProduct(id).subscribe({
         next: (response) => {

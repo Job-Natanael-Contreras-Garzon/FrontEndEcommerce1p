@@ -21,12 +21,6 @@ export class AdminAuthInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (request.url.includes('/auth/')) {
-      return next.handle(request.clone({
-        withCredentials: true
-      }));
-    }
-
     const token = this.authService.getToken();
     if (token) {
       request = this.addToken(request, token);
@@ -37,11 +31,6 @@ export class AdminAuthInterceptor implements HttpInterceptor {
         if (error.status === 401) {
           return this.handle401Error(request, next);
         }
-        
-        if (error.status === 403) {
-          this.router.navigate(['/auth/login']);
-        }
-
         return throwError(() => error);
       })
     );
@@ -49,28 +38,26 @@ export class AdminAuthInterceptor implements HttpInterceptor {
 
   private addToken(request: HttpRequest<any>, token: string): HttpRequest<any> {
     return request.clone({
-      withCredentials: true,
-      headers: request.headers.set('Authorization', `Bearer ${token}`)
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
     });
   }
 
   private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (!this.isRefreshing) {
-      this.isRefreshing = true;
-
-      return this.authService.refreshToken().pipe(
-        switchMap(token => {
-          this.isRefreshing = false;
-          return next.handle(this.addToken(request, token));
-        }),
-        catchError(error => {
-          this.isRefreshing = false;
-          this.authService.logout();
-          this.router.navigate(['/auth/login']);
-          return throwError(() => error);
-        })
-      );
-    }
-    return next.handle(request);
+    return this.authService.refreshToken().pipe(
+      switchMap((response) => {
+        const newToken = response.token;
+        if (newToken) {
+          return next.handle(this.addToken(request, newToken));
+        }
+        return throwError(() => new Error('Token refresh failed'));
+      }),
+      catchError((error) => {
+        this.authService.logout();
+        this.router.navigate(['/auth/login']);
+        return throwError(() => error);
+      })
+    );
   }
 }

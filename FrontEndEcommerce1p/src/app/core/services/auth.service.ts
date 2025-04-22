@@ -1,8 +1,8 @@
 // src/app/core/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { tap, catchError, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 
@@ -29,9 +29,16 @@ export interface RegisterResponse extends AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = `${environment.apiUrl}/auth`;
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+
+  // Usuario de prueba
+  private mockUser = {
+    id: 1,
+    username: 'admin',
+    email: 'admin@example.com',
+    role: 'admin'
+  };
 
   constructor(private http: HttpClient, private router: Router) {
     this.loadStoredUser();
@@ -46,23 +53,23 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.http
-      .post<LoginResponse>(`${this.apiUrl}/signin`, { email, password })
-      .pipe(
-        tap((response) => {
-          if (response.success && response.token && response.user) {
-            localStorage.setItem(environment.tokenName, response.token);
-            localStorage.setItem('currentUser', JSON.stringify(response.user));
-            this.currentUserSubject.next(response.user);
-          }
-        }),
-        catchError((error) => {
-          localStorage.removeItem(environment.tokenName);
-          localStorage.removeItem('currentUser');
-          this.currentUserSubject.next(null);
-          return throwError(() => error);
-        })
-      );
+    // Simulando login exitoso
+    const mockResponse: LoginResponse = {
+      success: true,
+      message: 'Login successful',
+      token: 'mock-jwt-token',
+      user: this.mockUser
+    };
+
+    return of(mockResponse).pipe(
+      tap((response) => {
+        if (response.success && response.token && response.user) {
+          localStorage.setItem(environment.tokenName, response.token);
+          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        }
+      })
+    );
   }
 
   logout(): void {
@@ -96,30 +103,31 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  refreshToken(): Observable<string> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/refresh-token`, {}).pipe(
-      map(response => {
-        if (response.success && response.token) {
-          localStorage.setItem(environment.tokenName, response.token);
-          return response.token;
-        }
-        throw new Error('Invalid refresh token response');
-      }),
-      catchError(error => {
-        console.error('Token refresh error:', error);
-        this.logout();
-        return throwError(() => new Error('Error refreshing token'));
-      })
-    );
+  register(registerData: { username: string; email: string; password: string }): Observable<RegisterResponse> {
+    // Simulando registro exitoso
+    const mockRegisterResponse: RegisterResponse = {
+      success: true,
+      message: 'Registration successful',
+      user_id: '2'
+    };
+    return of(mockRegisterResponse);
   }
 
-  register(registerData: { username: string; email: string; password: string }): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, registerData)
-      .pipe(
-        catchError(error => {
-          console.error('Registration error:', error);
-          return throwError(() => error);
-        })
-      );
+  refreshToken(): Observable<LoginResponse> {
+    // Simulando refresh de token exitoso
+    const mockResponse: LoginResponse = {
+      success: true,
+      message: 'Token refreshed successfully',
+      token: 'mock-jwt-token-' + new Date().getTime(),
+      user: this.mockUser
+    };
+
+    return of(mockResponse).pipe(
+      tap((response) => {
+        if (response.success && response.token) {
+          localStorage.setItem(environment.tokenName, response.token);
+        }
+      })
+    );
   }
 }

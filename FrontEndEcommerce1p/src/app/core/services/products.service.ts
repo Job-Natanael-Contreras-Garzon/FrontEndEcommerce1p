@@ -1,62 +1,100 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Product } from '../models/product.model';
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
-}
+import { ApiResponse } from '../models/api-response.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductsService {
-  private readonly apiUrl = `${environment.apiUrl}/admin/products`;
+  private mockProducts: Product[] = [
+    {
+      id: '1',
+      name: 'Producto 1',
+      description: 'Descripción del producto 1',
+      price: 99.99,
+      stock: 100,
+      category: 'Electrónicos',
+      imageUrl: 'https://via.placeholder.com/150'
+    },
+    {
+      id: '2',
+      name: 'Producto 2',
+      description: 'Descripción del producto 2',
+      price: 149.99,
+      stock: 50,
+      category: 'Ropa',
+      imageUrl: 'https://via.placeholder.com/150'
+    },
+    {
+      id: '3',
+      name: 'Producto 3',
+      description: 'Descripción del producto 3',
+      price: 199.99,
+      stock: 75,
+      category: 'Hogar',
+      imageUrl: 'https://via.placeholder.com/150'
+    }
+  ];
 
   constructor(private http: HttpClient) {}
 
   getProducts(): Observable<ApiResponse<Product[]>> {
-    return this.http.get<ApiResponse<Product[]>>(this.apiUrl)
-      .pipe(catchError(this.handleError));
+    return of({
+      success: true,
+      data: this.mockProducts,
+      message: 'Products retrieved successfully'
+    });
   }
 
-  getProduct(id: number): Observable<ApiResponse<Product>> {
-    return this.http.get<ApiResponse<Product>>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+  getProduct(id: string): Observable<ApiResponse<Product>> {
+    const product = this.mockProducts.find(p => p.id === id);
+    if (product) {
+      return of({
+        success: true,
+        data: product,
+        message: 'Product found'
+      });
+    }
+    return throwError(() => new Error('Product not found'));
   }
 
   addProduct(product: Omit<Product, 'id'>): Observable<ApiResponse<void>> {
-    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/add`, product)
-      .pipe(catchError(this.handleError));
+    const newProduct: Product = {
+      ...product,
+      id: (this.mockProducts.length + 1).toString()
+    };
+    this.mockProducts.push(newProduct);
+    return of({
+      success: true,
+      message: 'Product added successfully'
+    });
   }
 
-  updateProduct(id: number, changes: Partial<Product>): Observable<ApiResponse<void>> {
-    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/edit/${id}`, changes)
-      .pipe(catchError(this.handleError));
-  }
-
-  deleteProduct(id: number): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/delete/${id}`)
-      .pipe(catchError(this.handleError));
-  }
-
-  private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'An error occurred';
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = error.error.message;
-    } else {
-      errorMessage = error.error?.message || 'Server error';
-      if (error.status === 404) {
-        errorMessage = 'Product not found';
-      } else if (error.status === 400) {
-        errorMessage = error.error?.message || 'Invalid request';
-      }
+  updateProduct(id: string, changes: Partial<Product>): Observable<ApiResponse<void>> {
+    const index = this.mockProducts.findIndex(p => p.id === id);
+    if (index !== -1) {
+      this.mockProducts[index] = { ...this.mockProducts[index], ...changes };
+      return of({
+        success: true,
+        message: 'Product updated successfully'
+      });
     }
-    console.error('ProductsService Error:', error);
-    return throwError(() => new Error(errorMessage));
+    return throwError(() => new Error('Product not found'));
+  }
+
+  deleteProduct(id: string): Observable<ApiResponse<void>> {
+    const index = this.mockProducts.findIndex(p => p.id === id);
+    if (index !== -1) {
+      this.mockProducts.splice(index, 1);
+      return of({
+        success: true,
+        message: 'Product deleted successfully'
+      });
+    }
+    return throwError(() => new Error('Product not found'));
   }
 }

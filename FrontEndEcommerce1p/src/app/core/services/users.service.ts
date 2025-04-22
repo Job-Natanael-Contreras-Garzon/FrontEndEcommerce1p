@@ -1,59 +1,109 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { ApiResponse } from '../models/api-response.model';
 import { Users, CreateUsersDTO, UpdateUsersDTO } from '../models/users.model';
-
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsersService {
-  private readonly apiUrl = `${environment.apiUrl}/admin/users`;
+  // Datos de prueba
+  private mockUsers: Users[] = [
+    {
+      id: 1,
+      username: 'admin',
+      email: 'admin@example.com',
+      role: 'admin'
+    },
+    {
+      id: 2,
+      username: 'usuario1',
+      email: 'usuario1@example.com',
+      role: 'user'
+    },
+    {
+      id: 3,
+      username: 'usuario2',
+      email: 'usuario2@example.com',
+      role: 'user'
+    }
+  ];
 
   constructor(private http: HttpClient) {}
 
   getUsers(page: number = 1, limit: number = 10, role?: string): Observable<ApiResponse<{ users: Users[], total: number }>> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('limit', limit.toString());
-    
+    let filteredUsers = this.mockUsers;
     if (role) {
-      params = params.set('role', role);
+      filteredUsers = this.mockUsers.filter(user => user.role === role);
     }
+    
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const paginatedUsers = filteredUsers.slice(start, end);
 
-    return this.http.get<ApiResponse<{ users: Users[], total: number }>>(this.apiUrl, { params })
-      .pipe(catchError(this.handleError));
+    return of({
+      success: true,
+      data: {
+        users: paginatedUsers,
+        total: filteredUsers.length
+      },
+      message: 'Users retrieved successfully'
+    });
   }
 
   getUser(id: number): Observable<ApiResponse<Users>> {
-    return this.http.get<ApiResponse<Users>>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+    const user = this.mockUsers.find(u => u.id === id);
+    if (user) {
+      return of({
+        success: true,
+        data: user,
+        message: 'User found'
+      });
+    }
+    return throwError(() => new Error('User not found'));
   }
 
-  createUser(user: CreateUsersDTO): Observable<ApiResponse<Users>> {
-    return this.http.post<ApiResponse<Users>>(this.apiUrl, user)
-      .pipe(catchError(this.handleError));
+  createUser(userData: CreateUsersDTO): Observable<ApiResponse<Users>> {
+    const newUser: Users = {
+      id: this.mockUsers.length + 1,
+      username: userData.username,
+      email: userData.email,
+      role: userData.role || 'user'
+    };
+    
+    this.mockUsers.push(newUser);
+    return of({
+      success: true,
+      data: newUser,
+      message: 'User created successfully'
+    });
   }
 
   updateUser(id: number, changes: UpdateUsersDTO): Observable<ApiResponse<{ message: string }>> {
-    return this.http.put<ApiResponse<{ message: string }>>(`${this.apiUrl}/${id}`, changes)
-      .pipe(catchError(this.handleError));
+    const index = this.mockUsers.findIndex(u => u.id === id);
+    if (index !== -1) {
+      this.mockUsers[index] = {
+        ...this.mockUsers[index],
+        ...changes
+      };
+      return of({
+        success: true,
+        message: 'User updated successfully'
+      });
+    }
+    return throwError(() => new Error('User not found'));
   }
 
   deleteUser(id: number): Observable<ApiResponse<{ message: string }>> {
-    return this.http.delete<ApiResponse<{ message: string }>>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
-  }
-
-  private handleError(error: any) {
-    console.error('UsersService Error:', error);
-    return throwError(() => new Error(error.error?.message || 'An error occurred'));
+    const index = this.mockUsers.findIndex(u => u.id === id);
+    if (index !== -1) {
+      this.mockUsers.splice(index, 1);
+      return of({
+        success: true,
+        message: 'User deleted successfully'
+      });
+    }
+    return throwError(() => new Error('User not found'));
   }
 }
