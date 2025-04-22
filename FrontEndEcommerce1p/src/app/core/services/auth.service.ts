@@ -10,10 +10,10 @@ interface AuthResponse {
   success: boolean;
   message?: string;
   user?: {
-    id: string;
+    id: number;
     username: string;
     email: string;
-    roles?: string[];
+    role: string;
   };
 }
 
@@ -29,7 +29,7 @@ export interface RegisterResponse extends AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = `${environment.apiUrl}/client`;
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -47,20 +47,16 @@ export class AuthService {
 
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
+      .post<LoginResponse>(`${this.apiUrl}/signin`, { email, password })
       .pipe(
         tap((response) => {
-          console.log('Login response:', response);
-          if (response && response.token) {
+          if (response.success && response.token && response.user) {
             localStorage.setItem(environment.tokenName, response.token);
-            if (response.user) {
-              localStorage.setItem('currentUser', JSON.stringify(response.user));
-              this.currentUserSubject.next(response.user);
-            }
+            localStorage.setItem('currentUser', JSON.stringify(response.user));
+            this.currentUserSubject.next(response.user);
           }
         }),
         catchError((error) => {
-          console.error('Login error:', error);
           localStorage.removeItem(environment.tokenName);
           localStorage.removeItem('currentUser');
           this.currentUserSubject.next(null);
@@ -88,24 +84,12 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     const user = this.currentUserSubject.value;
-    return user?.roles?.includes(role) || false;
+    return user?.role === role;
   }
 
   getUserRoles(): string[] {
-    return this.currentUserSubject.value?.roles || [];
-  }
-
-  register(userData: any): Observable<RegisterResponse> {
-    return this.http
-      .post<RegisterResponse>(`${this.apiUrl}/register`, userData)
-      .pipe(
-        catchError((error) => {
-          console.error('Registration error:', error);
-          return throwError(
-            () => new Error(error.error?.message || 'Error durante el registro')
-          );
-        })
-      );
+    const user = this.currentUserSubject.value;
+    return user?.role ? [user.role] : [];
   }
 
   getCurrentUser(): any {
@@ -113,10 +97,13 @@ export class AuthService {
   }
 
   refreshToken(): Observable<string> {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/refresh-token`, {}).pipe(
-      map(response => response.token),
-      tap(token => {
-        localStorage.setItem(environment.tokenName, token);
+    return this.http.post<LoginResponse>(`${this.apiUrl}/refresh-token`, {}).pipe(
+      map(response => {
+        if (response.success && response.token) {
+          localStorage.setItem(environment.tokenName, response.token);
+          return response.token;
+        }
+        throw new Error('Invalid refresh token response');
       }),
       catchError(error => {
         console.error('Token refresh error:', error);
@@ -124,5 +111,15 @@ export class AuthService {
         return throwError(() => new Error('Error refreshing token'));
       })
     );
+  }
+
+  register(registerData: { username: string; email: string; password: string }): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, registerData)
+      .pipe(
+        catchError(error => {
+          console.error('Registration error:', error);
+          return throwError(() => error);
+        })
+      );
   }
 }

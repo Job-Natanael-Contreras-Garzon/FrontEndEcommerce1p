@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService, RegisterResponse } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -51,7 +51,7 @@ export class RegisterComponent implements OnInit {
     };
 
     this.auth.register(registerData).subscribe({
-      next: (response) => {
+      next: (response: RegisterResponse) => {
         this.loading = false;
         if (response.success) {
           this.successMessage = response.message || 'Registro exitoso. Por favor inicia sesión.';
@@ -62,9 +62,9 @@ export class RegisterComponent implements OnInit {
           this.error = response.message || 'Error en el registro';
         }
       },
-      error: (err) => {
+      error: (err: Error) => {
         this.loading = false;
-        this.error = err.error?.message || 'Error en el registro';
+        this.error = err.message || 'Error en el registro';
       }
     });
   }

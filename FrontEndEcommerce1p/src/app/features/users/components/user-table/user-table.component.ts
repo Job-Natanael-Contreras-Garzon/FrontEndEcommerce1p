@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UsersService } from '../../../../core/services/users.service';
-import { User } from '../../../../core/models/user.model';
+import { Users } from '../../../../core/models/users.model';
 import * as XLSX from 'xlsx';
-import { Users } from 'src/app/core/models/users.model';
 
 @Component({
   selector: 'app-user-table',
@@ -32,7 +31,7 @@ export class UserTableComponent implements OnInit {
     this.loading = true;
     this.usersService.getUsers(this.page, this.pageSize, this.selectedRole).subscribe({
       next: (response) => {
-        if (response.success) {
+        if (response.success && response.data) {
           this.users = response.data.users;
           this.total = response.data.total;
           this.calcPages();
@@ -98,11 +97,15 @@ export class UserTableComponent implements OnInit {
   }
 
   exportExcel() {
+    if (!this.users.length) {
+      return;
+    }
+
     const data = this.users.map(u => ({
       ID: u.id,
       Username: u.username,
       Email: u.email,
-      Roles: u.roles.join(', ')
+      Role: u.role
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);

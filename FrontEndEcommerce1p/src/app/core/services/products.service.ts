@@ -7,7 +7,7 @@ import { Product } from '../models/product.model';
 
 export interface ApiResponse<T> {
   success: boolean;
-  data: T;
+  data?: T;
   message?: string;
 }
 
@@ -15,16 +15,12 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class ProductsService {
-  private readonly apiUrl = `${environment.apiUrl}/client/products`;
+  private readonly apiUrl = `${environment.apiUrl}/admin/products`;
 
   constructor(private http: HttpClient) {}
 
-  getProducts(page: number = 1, limit: number = 10): Observable<ApiResponse<Product[]>> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('limit', limit.toString());
-
-    return this.http.get<ApiResponse<Product[]>>(this.apiUrl, { params })
+  getProducts(): Observable<ApiResponse<Product[]>> {
+    return this.http.get<ApiResponse<Product[]>>(this.apiUrl)
       .pipe(catchError(this.handleError));
   }
 
@@ -33,18 +29,18 @@ export class ProductsService {
       .pipe(catchError(this.handleError));
   }
 
-  addProduct(product: Omit<Product, 'id'>): Observable<ApiResponse<Product>> {
-    return this.http.post<ApiResponse<Product>>(`${this.apiUrl}`, product)
+  addProduct(product: Omit<Product, 'id'>): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/add`, product)
       .pipe(catchError(this.handleError));
   }
 
-  updateProduct(id: string | number, productData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, productData)
+  updateProduct(id: number, changes: Partial<Product>): Observable<ApiResponse<void>> {
+    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/edit/${id}`, changes)
       .pipe(catchError(this.handleError));
   }
 
   deleteProduct(id: number): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`)
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/delete/${id}`)
       .pipe(catchError(this.handleError));
   }
 
