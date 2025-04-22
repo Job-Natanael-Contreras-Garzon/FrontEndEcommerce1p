@@ -1,12 +1,24 @@
 .dialog-container {
   min-width: 400px;
   max-width: 600px;
-  padding: 20px;
+  padding: 0;
   width: 100%;
+
+  @media (max-width: 768px) {
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 mat-dialog-content {
   margin: 20px 0;
+
+  @media (max-width: 768px) {
+    flex: 1;
+    max-height: none !important;
+    padding: 12px !important;
+  }
 }
 
 .form-row {
@@ -29,12 +41,22 @@ textarea {
 }
 
 mat-dialog-actions {
-  padding: 16px 0 0;
+  padding: 16px !important;
   margin: 0;
   gap: 8px;
+  margin-bottom: 0;
+
+  @media (max-width: 768px) {
+    padding: 12px !important;
+  }
 
   button {
     margin-left: 8px;
+    min-width: 100px;
+
+    @media (max-width: 768px) {
+      flex: 1;
+    }
   }
 }
 
@@ -55,6 +77,14 @@ mat-dialog-actions {
   flex-direction: column;
   gap: 16px;
   margin-bottom: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  textarea {
+    min-height: 100px;
+  }
 }
 
 mat-spinner {

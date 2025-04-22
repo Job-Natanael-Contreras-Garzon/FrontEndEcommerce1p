@@ -30,25 +30,25 @@
       <!-- ID Column -->
       <ng-container matColumnDef="id">
         <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
-        <mat-cell *matCellDef="let category"> {{category.id}} </mat-cell>
+        <mat-cell *matCellDef="let category" data-label="ID"> {{category.id}} </mat-cell>
       </ng-container>
 
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
-        <mat-cell *matCellDef="let category"> {{category.name}} </mat-cell>
+        <mat-cell *matCellDef="let category" data-label="Name"> {{category.name}} </mat-cell>
       </ng-container>
 
       <!-- Description Column -->
       <ng-container matColumnDef="description">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Description </mat-header-cell>
-        <mat-cell *matCellDef="let category"> {{category.description}} </mat-cell>
+        <mat-cell *matCellDef="let category" data-label="Description"> {{category.description}} </mat-cell>
       </ng-container>
 
       <!-- Actions Column -->
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
-        <mat-cell *matCellDef="let category">
+        <mat-cell *matCellDef="let category" data-label="Actions">
           <button mat-icon-button color="primary" (click)="openEditDialog(category)">
             <mat-icon>edit</mat-icon>
           </button>

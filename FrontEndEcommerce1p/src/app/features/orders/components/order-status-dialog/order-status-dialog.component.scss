@@ -1,43 +1,82 @@
 .dialog-container {
   min-width: 350px;
+  padding: 0;
+
+  @media (max-width: 768px) {
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .form-container {
+  margin: 16px 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 8px 0;
+
+  p {
+    margin: 0;
+
+    &:last-of-type {
+      margin-bottom: 16px;
+    }
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px !important;
+  margin-bottom: 0;
+
+  @media (max-width: 768px) {
+    padding: 12px !important;
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      margin: 0 !important;
+
+      &:not(:last-child) {
+        margin-bottom: 8px !important;
+      }
+    }
+  }
 }
 
 .status-badge {
-  padding: 4px 8px;
+  padding: 6px 12px;
   border-radius: 16px;
   font-size: 12px;
   font-weight: 500;
   text-transform: uppercase;
-  
+
   &.pending {
     background-color: #fff3e0;
     color: #e65100;
   }
-  
+
   &.processing {
     background-color: #e3f2fd;
     color: #1565c0;
   }
-  
+
   &.shipped {
     background-color: #e8f5e9;
     color: #2e7d32;
   }
-  
+
   &.delivered {
-    background-color: #e8f5e9;
-    color: #1b5e20;
+    background-color: #e8eaf6;
+    color: #3949ab;
   }
-  
+
   &.cancelled {
     background-color: #fbe9e7;
-    color: #c62828;
+    color: #d32f2f;
   }
 }

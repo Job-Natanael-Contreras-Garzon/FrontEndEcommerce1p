@@ -37,16 +37,16 @@
           </thead>
           <tbody>
             <tr *ngFor="let user of users; let i = index">
-              <td>{{ (page - 1) * pageSize + i + 1 }}</td>
-              <td>{{ user.username }}</td>
-              <td>{{ user.email }}</td>
-              <td>
+              <td data-label="#">{{ (page - 1) * pageSize + i + 1 }}</td>
+              <td data-label="Username">{{ user.username }}</td>
+              <td data-label="Email">{{ user.email }}</td>
+              <td data-label="Roles">
                 <span *ngFor="let role of user.roles" 
                       class="badge bg-primary me-1">
                   {{ role }}
                 </span>
               </td>
-              <td>
+              <td data-label="Actions">
                 <button class="btn btn-sm btn-light me-1" (click)="editUser(user)">
                   <i class="bi bi-pencil"></i>
                 </button>

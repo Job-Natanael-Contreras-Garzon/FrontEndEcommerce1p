@@ -11,22 +11,42 @@
     gap: 16px;
     flex-wrap: wrap;
     flex: 1;
+    margin-bottom: 16px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
 
     mat-form-field {
+      flex: 1;
       min-width: 200px;
+
+      @media (max-width: 768px) {
+        width: 100%;
+        min-width: 100%;
+      }
     }
   }
 
   .header-buttons {
     display: flex;
     gap: 8px;
+    justify-content: flex-end;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
   }
 }
 
 .table-container {
   position: relative;
   min-height: 200px;
-  overflow: auto;
+  overflow-x: auto;
 }
 
 .loading-shade {
@@ -66,7 +86,7 @@
 }
 
 .status-badge {
-  padding: 4px 8px;
+  padding: 6px 12px;
   border-radius: 16px;
   font-size: 12px;
   font-weight: 500;
@@ -88,12 +108,65 @@
   }
   
   &.delivered {
-    background-color: #e8f5e9;
-    color: #1b5e20;
+    background-color: #e8eaf6;
+    color: #3949ab;
   }
   
   &.cancelled {
     background-color: #fbe9e7;
-    color: #c62828;
+    color: #d32f2f;
+  }
+}
+
+.mat-elevation-z8 {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+// Responsive table adjustments
+@media screen and (max-width: 768px) {
+  .mat-table {
+    .mat-header-row {
+      display: none;
+    }
+
+    .mat-row {
+      flex-direction: column;
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      
+      &:first-of-type {
+        border-top: 1px solid rgba(0, 0, 0, 0.12);
+      }
+    }
+
+    .mat-cell {
+      padding: 4px 0;
+      border-bottom: none;
+      
+      &:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+    }
+
+    .mat-column-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding-top: 8px;
+      margin-top: 8px;
+      border-top: 1px solid rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  .mat-paginator {
+    .mat-paginator-container {
+      justify-content: center;
+      padding: 0 8px;
+    }
   }
 }

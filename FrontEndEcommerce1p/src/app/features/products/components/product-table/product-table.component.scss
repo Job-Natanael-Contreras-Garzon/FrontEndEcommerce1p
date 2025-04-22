@@ -65,19 +65,37 @@
 }
 
 .table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
   mat-form-field {
-    flex: 1;
+    width: 300px;
+    
+    @media (max-width: 768px) {
+      width: 100%;
+    }
   }
 
   .header-buttons {
     display: flex;
     gap: 8px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+
+    button {
+      min-width: 120px;
+    }
   }
 }
 
@@ -105,7 +123,7 @@
 
 .mat-elevation-z8 {
   background: white;
-  border-radius: 4px;
+  border-radius: 8px;
   overflow: hidden;
   position: relative;
 }
@@ -119,6 +137,7 @@ mat-table {
   flex: 1;
   overflow: auto;
   min-height: 200px; // Altura mínima cuando no hay datos
+  overflow-x: auto;
 }
 
 table.table {
@@ -168,15 +187,16 @@ table.table {
 }
 
 .no-data-message {
+  padding: 16px;
   text-align: center;
-  padding: 2rem;
   color: rgba(0, 0, 0, 0.54);
 
   mat-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
+    color: rgba(0, 0, 0, 0.54);
   }
 
   p {
@@ -233,12 +253,72 @@ table.table {
   }
 }
 
+// Responsive table adjustments
+@media screen and (max-width: 768px) {
+  .mat-table {
+    .mat-header-row {
+      display: none;
+    }
+
+    .mat-row {
+      flex-direction: column;
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      
+      &:first-of-type {
+        border-top: 1px solid rgba(0, 0, 0, 0.12);
+      }
+    }
+
+    .mat-cell {
+      padding: 4px 0;
+      border-bottom: none;
+      
+      &:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+    }
+
+    .mat-column-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 8px;
+      margin-top: 8px;
+      border-top: 1px solid rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  .mat-paginator {
+    .mat-paginator-container {
+      justify-content: center;
+      padding: 0 8px;
+    }
+  }
+}
+
 // Cell styles
 .mat-cell, .mat-header-cell {
   padding: 8px 16px;
 }
 
+.mat-header-cell {
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.87);
+}
+
 .mat-column-price {
   justify-content: flex-end;
   padding-right: 24px;
+}
+
+.mat-column-actions {
+  width: 100px;
+  text-align: center;
+  
+  @media (max-width: 768px) {
+    width: 80px;
+  }
 }

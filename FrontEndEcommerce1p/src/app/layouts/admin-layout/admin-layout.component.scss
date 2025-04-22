@@ -76,6 +76,7 @@ body, main {
   bottom: 0;
   left: 0;
   right: 0;
+  min-height: 100vh;
 }
 
 .toolbar {
@@ -91,6 +92,12 @@ body, main {
   .mat-icon-button {
     margin-right: 8px;
   }
+
+  @media (max-width: 768px) {
+    .mat-toolbar-row, .mat-toolbar-single-row {
+      height: 56px;
+    }
+  }
 }
 
 .toolbar-spacer {
@@ -101,6 +108,10 @@ body, main {
   flex: 1;
   margin-top: 64px;
   min-height: calc(100vh - 64px);
+
+  @media (max-width: 768px) {
+    margin-top: 56px;
+  }
 }
 
 .sidenav {
@@ -140,6 +151,10 @@ body, main {
       font-weight: 500;
     }
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .content {
@@ -147,6 +162,26 @@ body, main {
   background-color: #fafafa;
   min-height: calc(100vh - 64px);
   box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
+}
+
+mat-nav-list {
+  a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
+    
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
 }
 
 // Responsive adjustments
