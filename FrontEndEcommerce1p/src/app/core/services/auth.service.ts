@@ -50,16 +50,18 @@ export class AuthService {
       .post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap((response) => {
-          if (response.success && response.token && response.user) {
+          if (response.success && response.token) {
             localStorage.setItem(environment.tokenName, response.token);
-            localStorage.setItem('currentUser', JSON.stringify(response.user));
-            this.currentUserSubject.next(response.user);
+            if (response.user) {
+              localStorage.setItem('currentUser', JSON.stringify(response.user));
+              this.currentUserSubject.next(response.user);
+            }
           }
         }),
         catchError((error) => {
           console.error('Login error:', error);
           return throwError(
-            () => new Error(error.error?.message || 'Error durante el inicio de sesión')
+            () => error
           );
         })
       );

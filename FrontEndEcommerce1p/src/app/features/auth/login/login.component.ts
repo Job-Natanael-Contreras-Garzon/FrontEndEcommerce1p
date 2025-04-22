@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
     });
 
     if (this.auth.isAuthenticated()) {
-      this.router.navigate(['/panel']);
+      this.router.navigate(['/panel/dashboard']);
     }
   }
 
@@ -55,12 +55,16 @@ export class LoginComponent implements OnInit {
     
     this.auth.login(email, password).subscribe({
       next: (response) => {
-        this.loading = false;
-        if (response.success) {
-          this.router.navigate(['/panel']);
+        if (response.success && response.token) {
+          this.router.navigate(['/panel/dashboard']).then(() => {
+            console.log('Navigation successful');
+          }).catch(err => {
+            console.error('Navigation error:', err);
+          });
         } else {
           this.error = response.message || 'Error en el inicio de sesión';
         }
+        this.loading = false;
       },
       error: (err) => {
         this.loading = false;
