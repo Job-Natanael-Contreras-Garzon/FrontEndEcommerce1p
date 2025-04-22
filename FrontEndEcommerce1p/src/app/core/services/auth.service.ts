@@ -50,7 +50,8 @@ export class AuthService {
       .post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap((response) => {
-          if (response.success && response.token) {
+          console.log('Login response:', response);
+          if (response && response.token) {
             localStorage.setItem(environment.tokenName, response.token);
             if (response.user) {
               localStorage.setItem('currentUser', JSON.stringify(response.user));
@@ -60,9 +61,10 @@ export class AuthService {
         }),
         catchError((error) => {
           console.error('Login error:', error);
-          return throwError(
-            () => error
-          );
+          localStorage.removeItem(environment.tokenName);
+          localStorage.removeItem('currentUser');
+          this.currentUserSubject.next(null);
+          return throwError(() => error);
         })
       );
   }

@@ -51,24 +51,30 @@ export class LoginComponent implements OnInit {
     }
 
     this.loading = true;
-    const { email, password } = this.loginForm.value;
+    const loginData = {
+      email: this.loginForm.value.email.trim(),
+      password: this.loginForm.value.password
+    };
     
-    this.auth.login(email, password).subscribe({
+    this.auth.login(loginData.email, loginData.password).subscribe({
       next: (response) => {
-        if (response.success && response.token) {
-          this.router.navigate(['/panel/dashboard']).then(() => {
-            console.log('Navigation successful');
-          }).catch(err => {
-            console.error('Navigation error:', err);
-          });
+        this.loading = false;
+        if (response.token) {
+          this.router.navigate(['/panel/dashboard'])
+            .then(() => console.log('Navigation successful'))
+            .catch(err => console.error('Navigation error:', err));
         } else {
           this.error = response.message || 'Error en el inicio de sesión';
         }
-        this.loading = false;
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error?.message || 'Credenciales incorrectas';
+        console.error('Login error:', err);
+        if (err.status === 500) {
+          this.error = 'Error interno del servidor. Por favor, intente más tarde.';
+        } else {
+          this.error = err.error?.message || 'Error en el inicio de sesión';
+        }
       }
     });
   }
